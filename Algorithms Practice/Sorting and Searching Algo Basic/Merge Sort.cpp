@@ -10,7 +10,7 @@ void merge(int arr[], int left, int midle, int right)
         LeftArr[i] = arr[left + i];
 
     for (int j = 0; j < n2; j++)
-        RightArr[j] = arr[midle + 1 + j];
+        RightArr[j] = arr[midle + j + 1 ];
 
     int i = 0,j=0,k=left;
 
@@ -46,10 +46,7 @@ void merge(int arr[], int left, int midle, int right)
 
 void mergeSort(int arr[],int left,int right)
 {
-    if(left>=right)
-    {
-        return;
-    }
+    if(left>=right)return;
     int midle = (left+right-1)/2;
     mergeSort(arr,left,midle);
     mergeSort(arr,midle+1,right);

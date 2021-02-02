@@ -9,8 +9,7 @@ int makePartition(int arr[], int low, int high)
     {
         if (arr[j] <= pivot)
         {
-            i++;
-            swap(arr[i], arr[j]);
+            swap(arr[++i], arr[j]);
         }
     }
     swap(arr[i + 1], arr[high]);
@@ -22,7 +21,6 @@ void quickSort(int arr[], int low, int high)
     if (low < high)
     {
         int pivot = makePartition(arr, low, high);
-
         quickSort(arr, low, pivot - 1);
         quickSort(arr, pivot + 1, high);
     }

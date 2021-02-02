@@ -3,10 +3,9 @@ int graph[20][20], visited[20], node, edge, i, j;
 
 void dfs(int v)
 {
-    int j;
     visited[v] = 1;
     printf(" %d->",v);
-    for(j=1; j <= node; j++)
+    for(int j=1; j <= node; j++)
     {
         if(graph[v][j] && !visited[j])
             dfs(j);
