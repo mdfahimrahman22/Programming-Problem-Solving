@@ -27,19 +27,19 @@ void printStack(stack<Node> myStack,int n)
     while(!s.empty())
     {
         a[i++]=s.top().side;
-        cout << s.top().sum<<" "<<s.top().it<<" "<<s.top().side<<" "<<s.top().remain<<endl;
+//        cout << s.top().sum<<" "<<s.top().it<<" "<<s.top().side<<" "<<s.top().remain<<endl;
 //        cout <<s.top().it<<" "<< s.top().side<<" \n";
         s.pop();
     }
-//    i--;
-//    for(int j=i-1; j>=0; j--,k++)
-//    {
-//        cout<<a[j]<<" ";
-//    }
-//    for(; k<n; k++)
-//    {
-//        cout<<0<<" ";
-//    }
+    i--;
+    for(int j=i-1; j>=0; j--,k++)
+    {
+        cout<<a[j]<<" ";
+    }
+    for(; k<n; k++)
+    {
+        cout<<0<<" ";
+    }
     cout<<endl;
 }
 void backtracking(int a[],int n,int Remain,int desiredSum)
@@ -51,7 +51,7 @@ void backtracking(int a[],int n,int Remain,int desiredSum)
     st.push(node);
     int stoppingCriteria=pow(2,n);
 
-    for(int i=0,j=0; i<n&&j<50; i++,j++)
+    for(int i=0,j=0; i<n&&j<stoppingCriteria; i++,j++)
     {
         if(i+1==n&&st.top().side==0&&st.top().sum!=desiredSum)
         {
@@ -71,6 +71,7 @@ void backtracking(int a[],int n,int Remain,int desiredSum)
         else if(st.top().sum==desiredSum)
         {
             printStack(st,n);
+//            cout<<"My st="<<st.top().side<<endl;
             st.pop();
             i--;
             while(st.top().side==0)
@@ -78,7 +79,7 @@ void backtracking(int a[],int n,int Remain,int desiredSum)
                 st.pop();
                 i--;
             }
-            cout<<"\nHurre!! "<<st.top().it<<" "<<st.top().side<<endl;
+//            cout<<"\nHurre!! "<<st.top().it<<" "<<st.top().side<<endl;
             if(st.top().it==1&&st.top().side==1&&st.top().remain==r-a[0])
             {
 
@@ -147,7 +148,7 @@ void backtracking(int a[],int n,int Remain,int desiredSum)
 int main()
 {
     fastIo
-    int a[]= {5,10,12,13,15,18};
+    int a[]= {5,10,12,13,15,15};
     int n=sizeof(a)/sizeof(a[0]);
     int sum=0;
     for(int i=0; i<n; i++)
