@@ -12,6 +12,7 @@ public:
         heap=arr;
         heap_size=n;
         heapify();
+        printHeap(n);
         for(int i=0; i<n; i++)
         {
             Delete();
@@ -45,7 +46,6 @@ public:
                 {
                     swap(heap[j],heap[left(j)]);
                     j=left(j);
-
                 }
                 else
                 {
