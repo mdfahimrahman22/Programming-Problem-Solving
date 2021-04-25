@@ -5,7 +5,7 @@ typedef long long int ll;
 int main()
 {
     fastIo
-    freopen("input.txt","r",stdin);
+    //freopen("input.txt","r",stdin);
     int t;
     ll n,ans;
     cin>>t;
@@ -13,35 +13,16 @@ int main()
     {
 
         cin>>n;
-        ans=n/25;
-        int di=2,digit=log10(n)+1;
-        for(;di<digit;di++){
-            ans+=9*di;
+        ll ans=0,x=0,num2=0,num5=0;
+        num2=n/2;
+
+        for(ll j=5; j<=n; j*=5)
+        {
+            num5+=n/j;
         }
 
-//        for(; di<digit;)
-//        {
-//            int x=n/10;
-//            if(x/100==0)
-//            {
-//                ans+=(x/10)*(di+1);
-//                break;
-//            }
-//            if(x!=0)
-//            {
-//                ans+=9*di;
-//                di++;
-//
-//
-//            }
-//            else
-//            {
-//                break;
-//            }
-//
-//        }
+        ans+=(num2<num5)?num2:num5;
         cout<<ans<<endl;
-
 
     }
     return 0;
