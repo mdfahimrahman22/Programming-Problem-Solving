@@ -31,7 +31,7 @@ char findParent(char v,map<char,char> parent)
 int main()
 {
     fastIo
-    freopen("input.txt","r",stdin);
+    //freopen("input.txt","r",stdin);
     int E,V,w;
     char s,d;
 
@@ -69,4 +69,6 @@ int main()
 
     return 0;
 }
+
+
 
