@@ -1,16 +1,17 @@
 #include<bits/stdc++.h>
 using namespace std;
-class SRTN
+class PS
 {
 public:
-    int process,arrivalTime,cpuTime,tempCpuTime,waitingTime,turnaroundTime;
-    SRTN() {}
-    SRTN(int p, int aT, int cT)
+    int process,arrivalTime,cpuTime,priority,tempCpuTime,waitingTime,turnaroundTime;
+    PS() {}
+    PS(int _process, int aT, int cT,int _priority)
     {
-        process=p;
+        process=_process;
         arrivalTime=aT;
         cpuTime=cT;
         tempCpuTime=cT;
+        priority=_priority;
     }
 
 };
@@ -32,13 +33,13 @@ public:
 
 int main()
 {
-    freopen("input.txt","r",stdin);
+    //freopen("input.txt","r",stdin);
 
     int n;
     cout<<"Enter the number of process:";
     cin>>n;
-    vector<SRTN> srtn;
-    int arrivalTimes[n],cpuTimes[n];
+    vector<PS> ps;
+    int arrivalTimes[n],cpuTimes[n],priority[n];
     cout<<"Enter the CPU times:\n";
     for(int i=0; i<n; i++)
     {
@@ -50,59 +51,67 @@ int main()
         cin>>arrivalTimes[i];
     }
 
+    cout<<"Enter the priorities:\n";
     for(int i=0; i<n; i++)
     {
-        srtn.push_back(SRTN(i+1,arrivalTimes[i],cpuTimes[i]));
+        cin>>priority[i];
+    }
+
+    for(int i=0; i<n; i++)
+    {
+        ps.push_back(PS(i+1,arrivalTimes[i],cpuTimes[i],priority[i]));
     }
 
     //Sorting by arrivalTime
-    sort(srtn.begin(),srtn.end(),[](const auto& lhs,const auto& rhs)
+    sort(ps.begin(),ps.end(),[](const auto& lhs,const auto& rhs)
     {
         return lhs.arrivalTime<rhs.arrivalTime;
     });
-    deque<SRTN> srtnDq;
-    srtnDq.push_back(srtn[0]);
+    deque<PS> psDq;
+    psDq.push_back(ps[0]);
     vector<GanttChart> ganttChart;
-    ganttChart.push_back(GanttChart(srtn[0].arrivalTime, srtn[0].process));
+    ganttChart.push_back(GanttChart(ps[0].arrivalTime, ps[0].process));
 
 
     // Calculating Gantt Chart
     for(int i=1; i<n; i++)
     {
-        int remainingProcessTime=srtnDq.front().tempCpuTime-(srtn[i].arrivalTime-ganttChart.back().startTime);
+        int cProcessPriority=psDq.front().priority;
+        int remainingProcessTime=psDq.front().tempCpuTime-(ps[i].arrivalTime-ganttChart.back().startTime);
 
         if(remainingProcessTime==0)
         {
-            srtnDq.pop_front();
-            srtnDq.push_back(srtn[i]);
-            sort(srtnDq.begin(),srtnDq.end(),[](const auto& lhs, const auto& rhs)
+            psDq.pop_front();
+            psDq.push_back(ps[i]);
+            sort(psDq.begin(),psDq.end(),[](const auto& lhs, const auto& rhs)
             {
-                return lhs.tempCpuTime<rhs.tempCpuTime;
+                return lhs.priority<rhs.priority;
             });
-            ganttChart.push_back(GanttChart(srtn[i].arrivalTime, srtnDq.front().process));
+
+            ganttChart.push_back(GanttChart(ps[i].arrivalTime, psDq.front().process));
         }
         else if(remainingProcessTime<0)
         {
-            int tempCpuTime=ganttChart.back().startTime+srtnDq.front().tempCpuTime;
-            srtnDq.pop_front();
-            sort(srtnDq.begin(),srtnDq.end(),[](const auto& lhs,const auto& rhs)
+            int tempCpuTime=ganttChart.back().startTime+psDq.front().tempCpuTime;
+            psDq.pop_front();
+            sort(psDq.begin(),psDq.end(),[](const auto& lhs,const auto& rhs)
             {
-                return lhs.tempCpuTime<rhs.tempCpuTime;
+                return lhs.priority<rhs.priority;
             });
-            ganttChart.push_back(GanttChart(tempCpuTime, srtnDq.front().process));
+            ganttChart.push_back(GanttChart(tempCpuTime, psDq.front().process));
             i--;
             continue;
         }
 
-        if(srtn[i].cpuTime<remainingProcessTime)
+        if(ps[i].priority<cProcessPriority)
         {
-            srtnDq.front().tempCpuTime=remainingProcessTime;
-            srtnDq.push_front(srtn[i]);
-            ganttChart.push_back(GanttChart(srtn[i].arrivalTime, srtn[i].process));
+            psDq.front().tempCpuTime=remainingProcessTime;
+            psDq.push_front(ps[i]);
+            ganttChart.push_back(GanttChart(ps[i].arrivalTime, ps[i].process));
         }
         else
         {
-            srtnDq.push_back(srtn[i]);
+            psDq.push_back(ps[i]);
         }
     }
 
@@ -110,14 +119,14 @@ int main()
     int sumCpuTime=0;
     while(true)
     {
-        sumCpuTime=ganttChart.back().startTime+srtnDq.front().tempCpuTime;
-        srtnDq.pop_front();
-        sort(srtnDq.begin(),srtnDq.end(),[](const auto& lhs,const auto& rhs)
+        sumCpuTime=ganttChart.back().startTime+psDq.front().tempCpuTime;
+        psDq.pop_front();
+        sort(psDq.begin(),psDq.end(),[](const auto& lhs,const auto& rhs)
         {
-            return lhs.tempCpuTime<rhs.tempCpuTime;
+            return lhs.priority<rhs.priority;
         });
-        if(srtnDq.size()<1)break;
-        ganttChart.push_back(GanttChart(sumCpuTime,srtnDq.front().process));
+        if(psDq.size()<1)break;
+        ganttChart.push_back(GanttChart(sumCpuTime,psDq.front().process));
     }
 
     // Printing Gantt Chart
@@ -135,7 +144,7 @@ int main()
     int turnaroundTimes[n+1];
     for(int i=0; i<n; i++)
     {
-        int currentProcess=srtn[i].process;
+        int currentProcess=ps[i].process;
         bool firstMatch=false;
         int waitingTime=0;
         int cProcessEndTime=0;
@@ -145,7 +154,7 @@ int main()
             {
                 if(!firstMatch)
                 {
-                    waitingTime+=ganttChart[j].startTime-srtn[i].arrivalTime;
+                    waitingTime+=ganttChart[j].startTime-ps[i].arrivalTime;
                     firstMatch=true;
                 }
                 else
@@ -155,8 +164,8 @@ int main()
                 if(j<gcn-1)cProcessEndTime=ganttChart[j+1].startTime;
             }
         }
-        srtn[i].waitingTime=waitingTime;
-        srtn[i].turnaroundTime=waitingTime+srtn[i].cpuTime;
+        ps[i].waitingTime=waitingTime;
+        ps[i].turnaroundTime=waitingTime+ps[i].cpuTime;
 
     }
     float sumWaitingTime=0.0;
@@ -164,7 +173,7 @@ int main()
 
 
     // Sorting by process
-    sort(srtn.begin(),srtn.end(),[](const auto& lhs, const auto& rhs)
+    sort(ps.begin(),ps.end(),[](const auto& lhs, const auto& rhs)
     {
         return lhs.process<rhs.process;
     });
@@ -173,9 +182,9 @@ int main()
     cout<<endl;
     for(int i=0; i<n; i++)
     {
-        sumWaitingTime+=srtn[i].waitingTime;
-        sumTurnaroundTime+=srtn[i].turnaroundTime;
-        cout<<"Process "<<srtn[i].process<<": Waiting Time: "<<srtn[i].waitingTime<<" Turnaround Time: "<<srtn[i].turnaroundTime<<endl;
+        sumWaitingTime+=ps[i].waitingTime;
+        sumTurnaroundTime+=ps[i].turnaroundTime;
+        cout<<"Process "<<ps[i].process<<": Waiting Time: "<<ps[i].waitingTime<<" Turnaround Time: "<<ps[i].turnaroundTime<<endl;
     }
     cout<<endl;
 
@@ -184,14 +193,7 @@ int main()
     return 0;
 }
 //Test Case 1:
-//4
-//10 5 8 15
-//0 1 2 3
-//Test Case 2:
-//4
-//10 5 8 15
-//0 1 2 3
-//Test Case 3:
-//5
-//6 2 8 3 4
-//2 5 1 0 4
+//3
+//5 7 9
+//4 0 2
+//0 2 1

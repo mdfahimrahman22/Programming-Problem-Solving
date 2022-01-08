@@ -18,75 +18,101 @@ public:
     }
 
 };
+class GanttChart
+{
+
+public:
+    int startTime;
+    int process;
+    GanttChart() {}
+    GanttChart(int sT, int p)
+    {
+        startTime=sT;
+        process=p;
+    }
+};
 int main()
 {
     fastIo
-
     freopen("input.txt","r",stdin);
+
     int n;
     cout<<"Enter the number of process:";
     cin>>n;
+
     int cpuTimes[n],arrivalTimes[n];
     vector<FCFS> fcfs;
+
     cout<<"Enter the CPU times:\n";
     for(int i=0; i<n; i++)
     {
         cin>>cpuTimes[i];
     }
+
     cout<<"Enter the arrival times:\n";
     for(int i=0; i<n; i++)
     {
         cin>>arrivalTimes[i];
     }
+
+
     for(int i=0; i<n; i++)
     {
         fcfs.push_back(FCFS(i+1,arrivalTimes[i],cpuTimes[i]));
     }
 
+    // Sorting by arrival time
     sort(fcfs.begin(),fcfs.end(),[](const auto& lhs,const auto& rhs)
     {
         return lhs.arrivalTime<rhs.arrivalTime;
     });
 
-//    cout<<"Process\tArrival Time\tCPU Time\n";
-//    for(int i=0; i<n; i++)
-//    {
-//        cout<<fcfs[i].process<<"\t"<<fcfs[i].arrivalTime<<"\t"<<fcfs[i].cpuTime<<endl;
-//    }
-    int ganttChart[n+1]={0};
-    ganttChart[0]=fcfs[0].arrivalTime;
-    ganttChart[1]=fcfs[0].cpuTime;
-    int sumCpuTime=ganttChart[0]+ganttChart[1];
+    // Calculating Gantt chart
+    vector<GanttChart> ganttChart;
+    int sumCpuTime=fcfs[0].arrivalTime;
 
-    for(int i=2;i<=n;i++)
+    for(int i=0; i<n; i++)
     {
-        ganttChart[i]=sumCpuTime+fcfs[i-1].cpuTime;
-        sumCpuTime=ganttChart[i];
+        ganttChart.push_back(GanttChart(sumCpuTime,fcfs[i].process));
+        sumCpuTime+=fcfs[i].cpuTime;
     }
-    cout<<"\nGantt Chart:"<<endl;
-    for(int i=0;i<=n;i++)
+
+
+    // Printing Gantt Chart
+    cout<<"\nGantt Chart:\n";
+    int gcn=ganttChart.size();
+    for(int i=0; i<ganttChart.size(); i++)
     {
-        cout<<ganttChart[i]<<" ";
+        cout<<ganttChart[i].startTime<<"---P"<<ganttChart[i].process<<"---";
     }
-    cout<<endl;
+    cout<<sumCpuTime<<endl;
+
+    // Sorting by process
+    sort(fcfs.begin(),fcfs.end(),[](const auto& lhs, const auto& rhs){return lhs.process<rhs.process;});
+
     float avgWaitingTime=0.0;
     float avgTurnaroundTime=0.0;
 
-    for(int i=0;i<n;i++){
-        fcfs[i].waitingTime=ganttChart[i]-fcfs[i].arrivalTime;
-        fcfs[i].turnaroundTime=fcfs[i].waitingTime+fcfs[i].cpuTime;
+    for(int i=0; i<n; i++)
+    {
+        int waitingTime=0;
+        for(int j=0;j<gcn;j++){
+            if(fcfs[i].process==ganttChart[j].process){
+                waitingTime=ganttChart[j].startTime-fcfs[i].arrivalTime;
+                break;
+            }
+        }
+        fcfs[i].waitingTime=waitingTime;
+        fcfs[i].turnaroundTime=waitingTime+fcfs[i].cpuTime;
+
         avgWaitingTime+=fcfs[i].waitingTime;
         avgTurnaroundTime+=fcfs[i].turnaroundTime;
     }
     avgWaitingTime=avgWaitingTime/n;
     avgTurnaroundTime=avgTurnaroundTime/n;
-    sort(fcfs.begin(),fcfs.end(),[](const auto& lhs,const auto& rhs){
-         return lhs.process<rhs.process;
-         });
 
-    cout<<endl;
-
-    for(int i=0;i<n;i++){
+    for(int i=0; i<n; i++)
+    {
         cout<<"Process "<<fcfs[i].process<<": Waiting Time: "<<fcfs[i].waitingTime<<" Turnaround Time: "<<fcfs[i].turnaroundTime<<endl;
     }
     cout<<"Average Waiting Time: "<<avgWaitingTime<<endl;
@@ -94,3 +120,12 @@ int main()
 
     return 0;
 }
+
+//Test Case 1:
+//3
+//5 7 9
+//4 0 2
+//Test Case 2:
+//4
+//5 3 8 6
+//0 1 2 3
